@@ -64,8 +64,7 @@ public class Main {
 				 }//end for loop
 				    
 				 //Clear title variable
-				 title = "";
-				    
+				 title = "";  
 				 //Adds each word of the title together with capitalization and trims the whitespace
 				 for (int i = 0; i < endTitleIndex; i++){
 					 title += joinedFileName[i].substring(0, 1).toUpperCase() 
@@ -88,7 +87,7 @@ public class Main {
         		 System.out.println(newDirectory);
         		 System.out.println(destination);
         		 
-			    //If destination exists... move files
+			    //If destination does not exist... create new directory and move files
 		        if (!Files.exists(destination.toPath())) {
 		        	try {
 		        		Files.createDirectories(newDirectory.toPath());
@@ -109,3 +108,5 @@ public class Main {
 		    }//end for-each file in content
 		}//end if statement
 	}//end Main
+	
+}//end class

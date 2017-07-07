@@ -15,6 +15,9 @@ public class Main {
 	public static String episode;
 	public static String seasonAndEpisode;
 	public static File destination;
+	public static File titleFolder;
+	public static File seasonFolder;
+	public static File newDirectory;
 	
 	public static void main(String[] args) {
 		
@@ -31,27 +34,31 @@ public class Main {
 				fileName = (file.getName().toString());
 				System.out.print(fileName);
 		    	
-		    	if (fileName.contains(".")) {
-			    	//Split file names at "."
-				    joinedFileName = fileName.split("\\.");
-		    	} else if (fileName.contains(" ")) {
+
+		    	if (fileName.contains(" ")) {
 		    		joinedFileName = fileName.split("\\s+");
-		    	}//end if-else
+		    	} else {
+				    	//Split file names at "."
+					    joinedFileName = fileName.split("\\.");
+		    	}
 		    	
 				//Pattern match to get occurrence of season and episode and output as full words
 				for (int i = 0; i < joinedFileName.length; i++){
 					if (joinedFileName[i].matches(seasonPattern)) {
 						season = joinedFileName[i].substring(0,1).toUpperCase() + "eason " + joinedFileName[i].substring(1);
 						episode = joinedFileName[i + 1].substring(0,1).toUpperCase() + "pisode " + joinedFileName[i + 1].substring(1);
+						seasonFolder = new File(season + "\\");
 						endTitleIndex = i;
 					} else if (joinedFileName[i].matches(episodePattern)) {
 						season = joinedFileName[i - 1].substring(0,1).toUpperCase() + "eason " + joinedFileName[i - 1].substring(1);
 						episode = joinedFileName[i].substring(0,1).toUpperCase() + "pisode " + joinedFileName[i].substring(1);
+						seasonFolder = new File(season + "\\");
 						endTitleIndex = i - 1;
 					} else if (joinedFileName[i].matches(bothPatterns)){
 						season = joinedFileName[i].substring(0,1).toUpperCase() + "eason " + joinedFileName[i].substring(1,3);
 						episode = joinedFileName[i].substring(3,4).toUpperCase() + "pisode " + joinedFileName[i].substring(4);
 						seasonAndEpisode = season + " " + episode;
+						seasonFolder = new File(season + "\\");
 						endTitleIndex = i;
 					}//end if-else
 				 }//end for loop
@@ -65,30 +72,40 @@ public class Main {
 				    		+ joinedFileName[i].substring(1).toLowerCase() + " ";
 				 }//end for loop
 				 title = title.trim();    
-		    	
-//				 //** Test code ** - visual output
-//				 //Prints out file name elements as strings, visual indication of successful move
-//				 System.out.println("");
-//				 System.out.println(title);
-//				 System.out.println(seasonAndEpisode);
-//				 System.out.println(season);
-//				 System.out.println(episode);
-			    
-        		//Make a new destination file for each file in content array
-        		destination = new File(tvShows.toString() + "\\" + title + "\\" + season + "\\" 
-        		+ title + ", " + seasonAndEpisode + ".mp4");
-        		
-			    //If both directories exist... move files
-		        if (tvShows.isDirectory()) {
+		    	 titleFolder = new File(title + "\\");
+		    	 
+				 //** Test code ** - visual output
+				 //Prints out file name elements as strings, visual indication of successful move
+				 System.out.println("");
+				 System.out.println(title);
+				 System.out.println(seasonAndEpisode);
+				 System.out.println(season);
+				 System.out.println(episode);
+		    	 
+		    	//Make a new destination file for each file in content array
+		    	 newDirectory = new File(tvShows.toString() + "\\" + titleFolder + "\\" + seasonFolder);
+        		 destination = new File(newDirectory + "\\" + title + ", " + seasonAndEpisode + ".mp4");
+        		 System.out.println(newDirectory);
+        		 System.out.println(destination);
+        		 
+			    //If destination exists... move files
+		        if (!Files.exists(destination.toPath())) {
+		        	try {
+		        		Files.createDirectories(newDirectory.toPath());
+						//Move file from initial file path to destination file path
+		        		Files.move(file.toPath(), destination.toPath());
+		        	} catch (IOException e) {
+		        		e.printStackTrace();
+		        	}
+		        } else {
 		        	try {
 						//Move file from initial file path to destination file path
 		        		Files.move(file.toPath(), destination.toPath());
 		        	} catch (IOException e) {
 						e.printStackTrace();
 					}//end try-catch block
-		        }//end if statement
-		    }//end for-each loop
+		        }//end if-else statement
+		        
+		    }//end for-each file in content
 		}//end if statement
 	}//end Main
-	
-}//end class
